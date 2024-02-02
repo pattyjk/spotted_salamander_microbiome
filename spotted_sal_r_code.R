@@ -134,7 +134,7 @@ life.alpha2<-ggplot(life.alpha, aes(LifeStage, `specnumber(life_stg_tbl)`, fill=
   theme_bw()+
   theme(legend.position = "none")+
   xlab("")+
-  ylab("ITS OTU Richness")
+  ylab("ITS sOTU Richness")
 
 larv.alpha2<-ggplot(larv.alph, aes(Treatment2, `specnumber(larv_tbl)`, fill=Treatment2))+
   geom_boxplot()+
@@ -224,7 +224,7 @@ life_stage_sum<-ddply(life_sum, c("LifeStage", "Class"), summarize, rel_abun=mea
 life_cast<-dcast(life_stage_sum, Class ~ LifeStage)
 life_cast$sum<-rowSums(life_cast[,-1])
 life_cast<-life_cast[order(life_cast$sum, decreasing = T),]
-life_cast<-life_cast[1:20,]
+life_cast<-life_cast[1:15,]
 life_cast<-as.data.frame(life_cast[,-grep('sum', names(life_cast))])
 
 #get 'others' category (things not in top20)
@@ -241,7 +241,9 @@ lifestages_melt<-melt(lifestages_class)
 pal<-c("#771155", "#CC99BB", "#114477", "#4477AA", "#117777", "#44AAAA", "#77CCCC", "#117744", "#44AA77", "#88CCAA", "#777711", "#AAAA44", "#DDDD77", "#774411", "#AA7744", "#DDAA77", "#771122", "#AA4455", "#DD7788","#41AB5D", "#252525", "#525252", "#737373", "#969696")
 
 #plot it
-life_taxonomy<-ggplot(lifestages_melt, aes(variable, value, fill=Class))+
+life_taxonomy<-
+  
+  ggplot(lifestages_melt, aes(variable, value, fill=Class))+
   geom_bar(stat='identity')+
   scale_y_continuous(expand=c(0,0))+
   scale_fill_manual(values=pal)+
