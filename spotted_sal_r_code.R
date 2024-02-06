@@ -73,6 +73,7 @@ larv.pcoa2<-
     scale_color_manual(values=c("#ABDAF4", "#F4CF7F", "#7F7F7F"))+
   xlab("PC1-23.9%")+
       ylab("PC2-11.8%")+
+  theme(legend.position = c(0.8, 0.2))+
   theme(text = element_text(size=14),
         axis.text = element_text(size=14), legend.text=element_text(size=14))
 
@@ -83,8 +84,10 @@ life.pcoa2<-
   theme_bw()+
   #geom_mark_circle(aes(color = LifeStage))+
   xlab("PC1-22.6%")+
+  theme(legend.position = c(0.8, 0.2))+
   ylab("PC2-13.6%")+
-  scale_color_manual(values=c("#FBF1A1", "#80CFBA", "#B0D9F1", "#7F7F7F"))
+  guides(color=guide_legend(override.aes=list(fill=NA)))+
+  scale_color_manual(values=c("#FBF1A1", "#80CFBA", "#B0D9F1", "#7F7F7F"))+
   theme(text = element_text(size=14),
         axis.text = element_text(size=14), legend.text=element_text(size=14))
 
@@ -107,6 +110,7 @@ life.permanova<-adonis(life.dis[,-44] ~ life.dis$LifeStage, permutations=10000)
 life.permanova$aov.tab
 #life stages are signficant, R2=0.61
 
+#####################################################
 #CALCULATE RICHNESS & add metadata & statistics
 larv.alph<-as.data.frame(specnumber(larv_tbl))
 larv.alph$SampleID<-row.names(larv.alph)
@@ -144,14 +148,15 @@ larv.alpha2<-ggplot(larv.alph, aes(Treatment2, `specnumber(larv_tbl)`, fill=Trea
   xlab("")+
   ylab("ITS OTU Richness")
 
-ggplot(juv.alpha, aes(as.factor(SampleDay), `specnumber(juv_tbl)`, fill=Treatment))+
+juv.alpha.fig<-ggplot(juv.alpha, aes(as.factor(SampleDay), `specnumber(juv_tbl)`, fill=Treatment))+
   geom_boxplot()+
   theme_bw()+
   scale_fill_manual(values=c("#9991C3", "#D1CFA2", "#88BB9A", "#7F7F7F", "#B3CDE6", "#D7A2CE", "#E6B3BA", "#B3CDE6", "#B18980"))+
-  facet_wrap(~Treatment)+
+  facet_wrap(~Treatment, ncol=9)+
   ylab("ITS OTU Richness")+
   xlab("")+
-  coord_cartesian(ylim=c(0,50))
+  coord_cartesian(ylim=c(0,50))+
+  theme(legend.position = "none")
 
 
 #######################Analyze taxonomy
@@ -234,6 +239,8 @@ others<-others %>% select(tax, everything())
 names(others)<-names(life_cast)
 life_cast<-rbind(life_cast, others)
 write.table(life_cast, 'life_cast.txt', row.names = F, quote=F, sep='\t')
+
+#reread in fix taonomy
 lifestages_class<-read.delim("spotted_salamander_microbiome/lifestages_class.txt", header=T)
 lifestages_melt<-melt(lifestages_class)
 
@@ -249,13 +256,10 @@ life_taxonomy<-
   scale_fill_manual(values=pal)+
   guides(fill=guide_legend(ncol=1))+
   xlab("")+
+  theme(axis.text.x = element_text(angle = 45, hjust=1))+
   ylab("Relative Abundance")+
   theme_bw()+
   theme(text = element_text(size=14))
-
-#make manuscript plots for larval/life stages data
-life_stage_fig<-ggarrange(life.alpha2, life_taxonomy, life.pcoa2, labels=c("A", "B", "C"), ncol=2, nrow=2)
-ggarrange(larv.alpha2, larv.pcoa2, ncol=2)
 
 ###Analyze juvenile experimental data for beta diversity (alpha diversity above)
 #read in metadata for each experiment
@@ -397,17 +401,27 @@ pene.coords<-merge(pene.coords, juv_meta, by=c('SampleID'), all.y=F)
 
 #plot it
 all_coords<-rbind(agi.coords, bac.coords, chry.coords, cont.coords, highbs.coords, highrep.coords, lowbs.coords, highthy.coords, pene.coords)
+all_coords$SampleDay<-as.factor(all_coords$SampleDay)
 
-
-ggplot(all_coords, aes(MDS1, MDS2, color=Treatment, shape=as.factor(SampleDay)))+  
+juv.coords<-
+  
+  ggplot(all_coords, aes(MDS1, MDS2, color=Treatment, shape=SampleDay))+  
   geom_point(aes(size=2))+
-  theme_minimal()+
+  theme_bw()+
   scale_color_manual(values=c("#9991C3", "#D1CFA2", "#88BB9A", "#7F7F7F", "#B3CDE6", "#D7A2CE", "#E6B3BA", "#B3CDE6", "#B18980"))+
-  xlab("PC1-%")+
- # geom_mark_circle(aes(color = as.factor(SampleDay)))+
-  ylab("PC2-%")+
-  facet_wrap(~Treatment, nrow = 1)+
-  theme(text = element_text(size=14),
-        axis.text = element_text(size=14), legend.text=element_text(size=14))
+  xlab("PC1")+
+  guides(fill='none', color='none', size='none')+
+  #theme(legend.position = "none")+
+ #geom_mark_circle(aes(color = as.factor(SampleDay)))+
+  ylab("PC2")+
+  theme(legend.position = c(0.05, 0.15))+
+  #theme(text = element_text(size=14),axis.text = element_text(size=14), legend.text=element_text(size=14))+
+  facet_wrap(~Treatment, nrow = 1)
   
   
+#make manuscript plots for larval/life stages data
+ggarrange(juv.alpha.fig, juv.coords, ncol=1, labels=c("A", "B"), widths=c(1,10))
+ggarrange(life.alpha2, life.pcoa2, life_taxonomy, labels=c("A", "B", "C"), ncol=3, nrow=1, widths = c(1.5, 1.5, 2))
+ggarrange(larv.alpha2, larv.pcoa2, ncol=2, labels=c("A", "B"))
+
+
