@@ -2,14 +2,14 @@ CORT pg/g/h	Treatment
 0.033971099	Control
 0.16483657	Control
 0.196266667	Control
-9.777856223	Lysinibacillus
+9.777856223	Bacillus
 11.50744157	Low Bsal 
-12.79914217	Lysinibacillus
-12.90373322	Lysinibacillus
-14.0102912	Lysinibacillus
+12.79914217	Bacillus
+12.90373322	Bacillus
+14.0102912	Bacillus
 15.05190366	Control
 15.91128206	Control
-16.15755714	Lysinibacillus
+16.15755714	Bacillus
 16.28248295	Chryseobacterium
 17.82289931	Low Bsal 
 18.88998694	Chryseobacterium
@@ -18,7 +18,7 @@ CORT pg/g/h	Treatment
 20.61327918	Chryseobacterium
 20.6337709	Agitated
 21.21099559	Agitated
-22.49096161	Lysinibacillus
+22.49096161	Bacillus
 23.07570281	Agitated
 23.08935179	Control
 23.65064928	Chryseobacterium
@@ -30,20 +30,20 @@ CORT pg/g/h	Treatment
 26.13513806	Control
 26.85487006	Control
 27.45824683	Chryseobacterium
-27.53818621	Lysinibacillus
+27.53818621	Bacillus
 27.975488	Control
 29.30662021	Control
 29.57213697	Chryseobacterium
-29.69052381	Lysinibacillus
+29.69052381	Bacillus
 29.7438241	Control
 29.87808296	Agitated
 29.94218779	Control
-30.26458108	Lysinibacillus
+30.26458108	Bacillus
 30.38241366	Control
 31.08527132	High Bsal
 32.62957756	Chryseobacterium
 33.01229566	Control
-33.41430176	Lysinibacillus
+33.41430176	Bacillus
 34.61633578	Control
 34.77443714	Control
 35.97503053	Agitated
@@ -54,19 +54,19 @@ CORT pg/g/h	Treatment
 38.04995538	High Bsal
 38.45510516	Agitated
 38.68957183	Agitated
-39.01655957	Lysinibacillus
+39.01655957	Bacillus
 39.11836198	Penicillium 
 39.93952318	High repeated
 40.16241343	Control
 40.55932172	High + Thyroid
 41.5393869	Control
-42.06324744	Lysinibacillus
+42.06324744	Bacillus
 42.59506639	Agitated
 44.24870131	Chryseobacterium
 44.32140925	Control
 44.55754419	Agitated
 44.78541244	Control
-44.96309123	Lysinibacillus
+44.96309123	Bacillus
 45.66376124	Control
 46.03017391	High + Thyroid
 46.71701531	Penicillium 
@@ -86,7 +86,7 @@ CORT pg/g/h	Treatment
 57.34665686	High repeated
 57.79405364	Penicillium 
 59.11340995	Control
-60.27528489	Lysinibacillus
+60.27528489	Bacillus
 60.62025481	Penicillium 
 61.4488868	High repeated
 62.22391129	High repeated
@@ -110,20 +110,20 @@ CORT pg/g/h	Treatment
 82.29726335	Penicillium 
 82.33829368	Agitated
 83.68266442	Penicillium 
-83.95063083	Lysinibacillus
+83.95063083	Bacillus
 83.99300039	Chryseobacterium
 84.63736048	Agitated
-85.08731721	Lysinibacillus
+85.08731721	Bacillus
 85.94933573	Control
 86.41253201	Low Bsal 
 86.83614781	High + Thyroid
-87.78865164	Lysinibacillus
+87.78865164	Bacillus
 87.86424431	High + Thyroid
 89.20634052	High Bsal
 89.78500477	High Bsal
 90.59763698	Penicillium 
 91.36594106	High repeated
-94.49331601	Lysinibacillus
+94.49331601	Bacillus
 95.96315549	High Bsal
 99.61778893	High Bsal
 100.185402	Chryseobacterium
@@ -131,9 +131,9 @@ CORT pg/g/h	Treatment
 104.5860494	Penicillium 
 105.531699	Control
 105.8231795	Control
-106.3434768	Lysinibacillus
+106.3434768	Bacillus
 106.6446034	Control
-107.901884	Lysinibacillus
+107.901884	Bacillus
 113.8107091	Control
 114.3602375	High repeated
 116.1808852	Penicillium 
