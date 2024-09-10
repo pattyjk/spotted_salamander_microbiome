@@ -162,15 +162,15 @@ juv.alpha.fig<-ggplot(juv.alpha, aes(as.factor(SampleDay), `specnumber(juv_tbl)`
 #######################Analyze taxonomy
 
 #read in taxonomy 
-tax<-read.delim("spotted_salamander_microbiome/taxonomy.tsv")
+tax<-read.delim("~/Documents/GitHub/spotted_salamander_microbiome/taxonomy.tsv")
 
 #read in metadata for each experiment
-juv_meta<-read.delim('spotted_salamander_microbiome/juvenile_exp_meta.txt', header=T)
-larv_meta<-read.delim('spotted_salamander_microbiome/larval_exp_meta.txt', header=T)
-life_meta<-read.delim('spotted_salamander_microbiome/life_stages_metadata.txt', header=T)
+juv_meta<-read.delim('~/Documents/GitHub/spotted_salamander_microbiome/juvenile_exp_meta.txt', header=T)
+larv_meta<-read.delim('~/Documents/GitHub/spotted_salamander_microbiome/larval_exp_meta.txt', header=T)
+life_meta<-read.delim('~/Documents/GitHub/spotted_salamander_microbiome/life_stages_metadata.txt', header=T)
 
 #read in asv table
-asv.tbl<-read.delim("spotted_salamander_microbiome/spot_sal_asv_table.txt", row.names=1, header=T)
+asv.tbl<-read.delim("~/Documents/GitHub/spotted_salamander_microbiome/spot_sal_asv_table.txt", row.names=1, header=T)
 dim(asv.tbl)
 #2106  234
 
@@ -214,9 +214,9 @@ juv_melt<-melt(juv_split)
 larv_melt<-melt(larv_split)
 life_melt<-melt(life_split)
 
-#calculate the relative abundace for each class for each sample
-juv_sum<-ddply(juv_melt, c("variable", 'Class'), summarize, rel_abun=sum(value))
-larv_sum<-ddply(larv_melt, c("variable", 'Class'), summarize, rel_abun=sum(value))
+#calculate the relative abundace for each class or genus for each sample
+juv_sum<-ddply(juv_melt, c("variable", 'Genus'), summarize, rel_abun=sum(value))
+larv_sum<-ddply(larv_melt, c("variable", 'Genus'), summarize, rel_abun=sum(value))
 life_sum<-ddply(life_melt, c("variable", 'Class'), summarize, rel_abun=sum(value))
 
 #add metadata
@@ -224,6 +224,86 @@ life_sum<-merge(life_sum, life_meta, by.x = 'variable', by.y='SampleID')
 larv_sum<-merge(larv_sum, larv_meta, by.x = 'variable', by.y='SampleID')
 juv_sum<-merge(juv_sum, juv_meta, by.x = 'variable', by.y='SampleID')
 
+#summarize for larval data
+larv_sum2<-ddply(larv_sum, c("Treatment2", "Genus"), summarize, rel_abun=mean(rel_abun))
+larv_cast<-dcast(larv_sum2, Genus ~ Treatment2)
+larv_cast$sum<-rowSums(larv_cast[,-1])
+larv_cast<-larv_cast[order(larv_cast$sum, decreasing = T),]
+larv_cast<-larv_cast[1:15,]
+larv_cast<-as.data.frame(larv_cast[,-grep('sum', names(larv_cast))])
+
+#get 'others' category (things not in top20)
+others<-as.data.frame(t(1-colSums(larv_cast[,-1])))
+others$tax<-"Others"
+others<-others %>% select(tax, everything())
+names(others)<-names(larv_cast)
+larv_cast<-rbind(larv_cast, others)
+write.table(larv_cast, '~/Documents/GitHub/spotted_salamander_microbiome/larv_cast.txt', row.names = F, quote=F, sep='\t')
+
+#melt it
+larv_cast<-read.delim('~/Documents/GitHub/spotted_salamander_microbiome/larv_cast.txt', header=T)
+larv_cast_m<-melt(larv_cast)
+#read in the best pallette
+pal<-c("#771155", "#CC99BB", "#114477", "#4477AA", "#117777", "#44AAAA", "#77CCCC", "#117744", "#44AA77", "#88CCAA", "#777711", "#AAAA44", "#DDDD77", "#774411", "#AA7744", "#DDAA77", "#771122", "#AA4455", "#DD7788","#41AB5D", "#252525", "#525252", "#737373", "#969696")
+
+#plot larval data it
+  larv_taxa<-ggplot(larv_cast_m, aes(variable, value, fill=Genus))+
+  geom_bar(stat='identity')+
+  scale_y_continuous(expand=c(0,0))+
+  scale_fill_manual(values=pal)+
+  guides(fill=guide_legend(ncol=1))+
+    ggtitle("A")+
+  xlab("")+
+  theme(axis.text.x = element_text(angle = 45, hjust=1))+
+  ylab("Relative Abundance")+
+  theme_bw()+
+  theme(text = element_text(size=14))
+#########
+  
+  #summarize for juvenile data
+  juv_sum2<-ddply(juv_sum, c("Treatment", "Genus", 'SampleDay'), summarize, rel_abun=mean(rel_abun))
+  juv_cast<-dcast(juv_sum2, Genus + SampleDay ~ Treatment)
+  juv_cast$sum<-rowSums(juv_cast[,-c(1,2)])
+  juv_cast<-juv_cast[order(juv_cast$sum, decreasing = T),]
+  juv_cast<-juv_cast[1:30,]
+  juv_cast<-as.data.frame(juv_cast[,-grep('sum', names(juv_cast))])
+  
+  #get 'others' category (things not in top20)
+  others<-as.data.frame(t(1-colSums(juv_cast[,-c(1,2)])))
+  others$tax<-"Others"
+  others<-others %>% select(tax, everything())
+  others$SampleDay<-'NA'
+  others<-others %>% select(SampleDay, everything())
+  others<-others[,c(2,1, 3:ncol(others))]
+  
+
+  juv_cast<-rbind(juv_cast, others)
+  write.table(juv_cast, '~/Documents/GitHub/spotted_salamander_microbiome/juv_cast.txt', row.names = F, quote=F, sep='\t')
+  
+  #melt it
+  juv_cast<-read.delim('~/Documents/GitHub/spotted_salamander_microbiome/juv_cast.txt', header=T)
+  juv_cast$SampleDay<-as.factor(juv_cast$SampleDay)
+  juv_cast_m<-melt(juv_cast)
+  #read in the best pallette
+  pal<-c("#771155", "#CC99BB", "#114477", "#4477AA", "#117777", "#44AAAA", "#77CCCC", "#117744", "#44AA77", "#88CCAA", "#777711", "#AAAA44", "#DDDD77", "#774411", "#AA7744", "#DDAA77", "#771122", "#AA4455", "#DD7788","#41AB5D", "#252525", "#525252", "#737373", "#969696")
+  
+  #plot larval data it
+  juv_taxa<-ggplot(juv_cast_m, aes(SampleDay, value, fill=Genus))+
+    geom_bar(stat='identity')+
+    scale_y_continuous(expand=c(0,0))+
+    scale_fill_manual(values=pal)+
+    guides(fill=guide_legend(ncol=1))+
+    facet_wrap(~variable, nrow=1)+
+    ggtitle("B")+
+    xlab("Day")+
+    theme(axis.text.x = element_text(angle = 45, hjust=1))+
+    ylab("Relative Abundance")+
+    theme_bw()+
+    theme(text = element_text(size=14))
+  
+  #plot both larva and juvenile taxonomy
+  ggarrange(larv_taxa, juv_taxa, nrow=2, widths = c(1,6))
+#####################################
 #summarize only for life stage data
 life_stage_sum<-ddply(life_sum, c("LifeStage", "Class"), summarize, rel_abun=mean(rel_abun))
 life_cast<-dcast(life_stage_sum, Class ~ LifeStage)
@@ -263,10 +343,10 @@ life_taxonomy<-
 
 ###Analyze juvenile experimental data for beta diversity (alpha diversity above)
 #read in metadata for each experiment
-juv_meta<-read.delim('spotted_salamander_microbiome/juvenile_exp_meta.txt', header=T)
+juv_meta<-read.delim('~/Documents/GitHub/spotted_salamander_microbiome/juvenile_exp_meta.txt', header=T)
 
 #read in asv table
-asv.tbl<-read.delim("spotted_salamander_microbiome/spot_sal_asv_table.txt", row.names=1, header=T)
+asv.tbl<-read.delim("~/Documents/GitHub/spotted_salamander_microbiome/spot_sal_asv_table.txt", row.names=1, header=T)
 dim(asv.tbl)
 #2106  241
 
